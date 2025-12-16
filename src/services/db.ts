@@ -1,21 +1,35 @@
+// src/services/db.ts
 import PouchDB from 'pouchdb-browser';
+import PouchFind from 'pouchdb-find';
 
-// 1. Create Local Database (Works in Browser, Electron, Mobile)
-const db = new PouchDB('school_data_local');
+PouchDB.plugin(PouchFind);
 
-// 2. Setup Sync (Remote CouchDB)
-// In production, replace with your actual CouchDB/Sync Gateway URL
-const remoteDB = new PouchDB('http://admin:password@localhost:5984/school_data_remote');
+// Create databases
+const db = new PouchDB('esrcm_local');
 
-export const syncData = () => {
-  return db.sync(remoteDB, {
-    live: true,
-    retry: true
-  }).on('change', (info) => {
-    console.log('Data changed:', info);
-  }).on('error', (err) => {
-    console.error('Sync error:', err);
-  });
-};
+// Setup indexes for fast searching
+db.createIndex({
+  index: { fields: ['classId', 'type'] }
+});
 
 export default db;
+
+// Helper to seed dummy data for testing
+export const seedDatabase = async () => {
+  try {
+    const studentCheck = await db.allDocs({ limit: 1 });
+    if (studentCheck.rows.length === 0) {
+      await db.post({
+        type: 'student',
+        name: 'Usman Jalo',
+        regNo: '001',
+        classId: 'JSS1',
+        attendance: { present: 85, absent: 5, total: 90 },
+        financial: { totalDue: 50000, totalPaid: 10000, isBlocked: false } // Defaulter
+      });
+      console.log('Database seeded!');
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
