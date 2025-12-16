@@ -18,6 +18,7 @@ export interface Student {
   };
 }
 
+// This is the part that was missing or causing the error
 export interface Result {
   _id: string; // format: result_studentId_termId_subjectId
   studentId: string;

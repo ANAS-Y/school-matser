@@ -1,5 +1,5 @@
 // src/services/expertSystem.ts
-import { Student, Result, WAEC_GRADING } from '../types';
+import { type Student, type Result, WAEC_GRADING } from '../types';
 
 export const ExpertSystem = {
   
